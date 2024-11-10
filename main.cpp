@@ -1,4 +1,3 @@
-#include <fstream>
 #include <iostream>
 #include "input_reader.hpp"
 #include "stat_reader.hpp"

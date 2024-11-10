@@ -13,7 +13,7 @@ Stop::Stop(std::string name, double latitude, double longitude): name(std::move(
 Bus::Bus(std::string name, std::vector<const Stop *> stops, bool is_round_trip): name(std::move(name)), stops(std::move(stops)), is_round_trip(is_round_trip) {}
 
 size_t StopPairHasher::operator()(const std::pair<const Stop *, const Stop *> &stops) const noexcept {
-    return std::hash<const void*>()(stops.first) ^ (std::hash<const void*>()(stops.second) << 1);
+    return std::hash<const void*>()(stops.first) ^ std::hash<const void*>()(stops.second) << 1;
 }
 
 TransportCatalogue::TransportCatalogue() = default;
@@ -45,19 +45,19 @@ void TransportCatalogue::addBus(Bus bus) {
 }
 
 const Stop* TransportCatalogue::findStop(std::string_view stop_name) const {
-    auto it = stop_name_to_stop_.find(stop_name);
+    const auto it = stop_name_to_stop_.find(stop_name);
     return it != stop_name_to_stop_.end() ? it->second : nullptr;
 }
 
 const Bus* TransportCatalogue::findBus(std::string_view bus_name) const {
-    auto it = bus_name_to_bus_.find(bus_name);
+    const auto it = bus_name_to_bus_.find(bus_name);
     return it != bus_name_to_bus_.end() ? it->second : nullptr;
 }
 
 Stop *TransportCatalogue::add_to_stops_deque(const Stop &stop) {
     stops_.push_back(stop);
 
-    return &(stops_.back());
+    return &stops_.back();
 }
 
 Bus *TransportCatalogue::add_to_buses_deque(const Bus &bus) {
@@ -98,7 +98,7 @@ std::optional<RouteInfo> TransportCatalogue::GetRouteInfo(std::string_view bus_n
         }
     }
 
-    double curvature = road_length / geo_length;
+    const double curvature = road_length / geo_length;
 
     return RouteInfo{stops.size(), std::unordered_set(stops.begin(), stops.end()).size(), road_length, curvature};
 }

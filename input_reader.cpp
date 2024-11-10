@@ -54,12 +54,12 @@ Stop parseStop(std::istream& input) {
     std::unordered_map<std::string, int> distances;
     std::string distance_part;
     while (line_stream >> distance_part) {
-        auto m_pos = distance_part.find('m');
+        const auto m_pos = distance_part.find('m');
         if (m_pos == std::string::npos) {
             throw std::runtime_error("Invalid distance format");
         }
 
-        int distance = std::stoi(distance_part.substr(0, m_pos));
+        const int distance = std::stoi(distance_part.substr(0, m_pos));
 
         std::string to_stop;
         line_stream >> to_stop >> to_stop;
@@ -73,7 +73,7 @@ std::vector<std::string_view> Split(std::string_view str, char delimiter) {
     std::vector<std::string_view> result;
     size_t pos = 0;
     while (true) {
-        size_t delimiter_pos = str.find(delimiter, pos);
+        const size_t delimiter_pos = str.find(delimiter, pos);
         result.push_back(str.substr(pos, delimiter_pos - pos));
         if (delimiter_pos == std::string_view::npos) {
             break;
@@ -105,7 +105,7 @@ Bus parseBus(std::istream &input, TransportCatalogue& catalogue) {
     for (const auto& stop_name : stop_names) {
         const Stop* stop = catalogue.findStop(stop_name);
         if (!stop) {
-            Stop new_stop(std::string(stop_name), 0.0, 0.0);
+            const Stop new_stop(std::string(stop_name), 0.0, 0.0);
             catalogue.addStop(new_stop);
             stop = catalogue.findStop(stop_name);
         }
@@ -113,6 +113,6 @@ Bus parseBus(std::istream &input, TransportCatalogue& catalogue) {
     }
 
 
-    bool is_round_trip = (delimiter == '-');
+    bool is_round_trip = delimiter == '-';
     return {std::move(bus_name), std::move(stops), is_round_trip};
 }
