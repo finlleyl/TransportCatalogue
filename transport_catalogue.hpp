@@ -31,6 +31,7 @@ struct RouteInfo {
     size_t stop_count;
     size_t unique_stop_count;
     double route_length;
+    double curvature;
 };
 
 struct StopInfo {
@@ -73,7 +74,7 @@ public:
 
     void add_to_bus_name_to_bus(std::string_view bus_name, Bus *bus);
 
-    std::optional<RouteInfo> getRouteInfo(std::string_view bus_name) const;
+    std::optional<RouteInfo> GetRouteInfo(std::string_view bus_name) const;
 
     std::optional<StopInfo> getStopInfo(std::string_view stop_name) const;
 

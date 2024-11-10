@@ -30,9 +30,8 @@ void ReadInput(std::istream &input, TransportCatalogue &catalogue) {
 }
 
 void RemoveUnwantedCharacters(std::string &str) {
-    str.erase(std::remove_if(str.begin(), str.end(),
-                             [](char c) { return c == ',' || c == ':'; }),
-              str.end());
+    std::erase_if(str,
+                  [](char c) { return c == ',' || c == ':'; });
 }
 
 Stop parseStop(std::istream& input) {

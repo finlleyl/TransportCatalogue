@@ -75,36 +75,34 @@ void TransportCatalogue::add_to_bus_name_to_bus(std::string_view bus_name, Bus* 
 }
 
 
-std::optional<RouteInfo> TransportCatalogue::getRouteInfo(std::string_view bus_name) const {
+std::optional<RouteInfo> TransportCatalogue::GetRouteInfo(std::string_view bus_name) const {
     const Bus* bus = findBus(bus_name);
     if (!bus) {
         return std::nullopt;
     }
 
-    size_t stop_count = bus->stops.size();
-    std::unordered_set<const Stop*> unique_stops(bus->stops.begin(), bus->stops.end());
-    size_t unique_stop_count = unique_stops.size();
+    double geo_length = 0.0;
+    double road_length = 0;
 
-    double route_length = 0.0;
-    for (size_t i = 1; i < bus->stops.size(); ++i) {
-        route_length += ComputeDistance(
-            {bus->stops[i - 1]->latitude, bus->stops[i - 1]->longitude},
-            {bus->stops[i]->latitude, bus->stops[i]->longitude}
-        );
+    const auto& stops = bus->stops;
+    for (size_t i = 1; i < stops.size(); ++i) {
+        geo_length += ComputeDistance({stops[i - 1]->latitude, stops[i - 1]->longitude},
+                                      {stops[i]->latitude, stops[i]->longitude});
+
+        road_length += getDistance(stops[i - 1], stops[i]);
     }
 
     if (!bus->is_round_trip) {
-        for (size_t i = bus->stops.size() - 1; i > 0; --i) {
-            route_length += ComputeDistance(
-                {bus->stops[i]->latitude, bus->stops[i]->longitude},
-                {bus->stops[i - 1]->latitude, bus->stops[i - 1]->longitude}
-            );
+        for (size_t i = stops.size() - 1; i > 0; --i) {
+            road_length += getDistance(stops[i], stops[i - 1]);
         }
-        stop_count = stop_count * 2 - 1;
     }
 
-    return RouteInfo{stop_count, unique_stop_count, route_length};
+    double curvature = road_length / geo_length;
+
+    return RouteInfo{stops.size(), std::unordered_set(stops.begin(), stops.end()).size(), road_length, curvature};
 }
+
 
 std::optional<StopInfo> TransportCatalogue::getStopInfo(std::string_view stop_name) const {
     const Stop* stop = findStop(stop_name);
