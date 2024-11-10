@@ -26,24 +26,20 @@ void ProcessOutputRequests(std::istream& input, const TransportCatalogue& catalo
     }
 }
 
-void OutputBus(std::istream &input, std::ostream &output, const TransportCatalogue &catalogue) {
-    std::string bus_name;
-    input >> bus_name;
-    bus_name.erase(0, bus_name.find_first_not_of(' '));
-
-    if (catalogue.findBus(bus_name)) {
-        if (const auto route_info = catalogue.getRouteInfo(bus_name); route_info.has_value()) {
-            output << "Bus " << bus_name << ": "
-                      << route_info.value().stop_count << " stops on route, "
-                      << route_info.value().unique_stop_count << " unique stops, "
-                      << std::setprecision(6) << route_info.value().route_length << " route length" << std::endl;
-        } else {
-            output << "Bus " << bus_name << ": no route info available" << std::endl;
-        }
-    } else {
-        output << "Bus " << bus_name << ": not found" << std::endl;
+void OutputBus(std::ostream& output, const TransportCatalogue& catalogue, std::string_view bus_name) {
+    const auto info = catalogue.GetRouteInfo(bus_name);
+    if (!info) {
+        output << "Bus " << bus_name << ": not found\n";
+        return;
     }
+
+    output << "Bus " << bus_name << ": "
+           << info->stop_count << " stops on route, "
+           << info->unique_stop_count << " unique stops, "
+           << info->route_length << " route length, "
+           << std::setprecision(6) << info->curvature << " curvature\n";
 }
+
 
 void OutputStop(std::istream &input, std::ostream &output, const TransportCatalogue &catalogue) {
     std::string stop_name;
