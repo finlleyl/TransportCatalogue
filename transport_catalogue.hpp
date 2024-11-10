@@ -39,8 +39,6 @@ private:
     std::unordered_map<std::string_view, Stop*> stop_name_to_stop_;
     std::unordered_map<std::string_view, Bus*> bus_name_to_bus_;
 
-
-
 public:
     TransportCatalogue();
 
@@ -55,8 +53,11 @@ public:
     const Bus *findBus(std::string_view bus_name) const;
 
     Stop *add_to_stops_deque(const Stop &stop);
+
     Bus* add_to_buses_deque(const Bus& bus);
+
     void add_to_stop_name_to_stop(std::string_view stop_name, Stop *stop);
+
     void add_to_bus_name_to_bus(std::string_view bus_name, Bus *bus);
 
     std::optional<RouteInfo> getRouteInfo(std::string_view bus_name) const;

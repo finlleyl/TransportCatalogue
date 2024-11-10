@@ -10,7 +10,7 @@ void ProcessOutputRequests(std::istream& input, const TransportCatalogue& catalo
     input >> query_count;
     input.ignore();
 
-    for (int i = 0; i < query_count; ++i) {`
+    for (int i = 0; i < query_count; ++i) {
         std::string line;
         std::getline(input, line);
 
@@ -19,23 +19,33 @@ void ProcessOutputRequests(std::istream& input, const TransportCatalogue& catalo
         line_stream >> command;
 
         if (command == "Bus") {
-            std::string bus_name;
-            line_stream >> bus_name;
-            bus_name.erase(0, bus_name.find_first_not_of(' '));
-
-            if (catalogue.findBus(bus_name)) {
-                auto route_info = catalogue.getRouteInfo(bus_name);
-                if (route_info.has_value()) {
-                    std::cout << "Bus " << bus_name << ": "
-                              << route_info.value().stop_count << " stops on route, "
-                              << route_info.value().unique_stop_count << " unique stops, "
-                              << std::setprecision(6) << route_info.value().route_length << " route length" << std::endl;
-                } else {
-                    std::cout << "Bus " << bus_name << ": no route info available" << std::endl;
-                }
-            } else {
-                std::cout << "Bus " << bus_name << ": not found" << std::endl;
-            }
+            OutputBus(line_stream, std::cout, catalogue);
+        } else if (command == "Stop") {
+            OutputStop(line_stream, std::cout, catalogue);
         }
     }
+}
+
+void OutputBus(std::istream &input, std::ostream &output, const TransportCatalogue &catalogue) {
+    std::string bus_name;
+    input >> bus_name;
+    bus_name.erase(0, bus_name.find_first_not_of(' '));
+
+    if (catalogue.findBus(bus_name)) {
+        auto route_info = catalogue.getRouteInfo(bus_name);
+        if (route_info.has_value()) {
+            output << "Bus " << bus_name << ": "
+                      << route_info.value().stop_count << " stops on route, "
+                      << route_info.value().unique_stop_count << " unique stops, "
+                      << std::setprecision(6) << route_info.value().route_length << " route length" << std::endl;
+        } else {
+            output << "Bus " << bus_name << ": no route info available" << std::endl;
+        }
+    } else {
+        output << "Bus " << bus_name << ": not found" << std::endl;
+    }
+}
+
+void OutputStop(std::istream &input, std::ostream &output, const TransportCatalogue &catalogue) {
+    return;
 }
