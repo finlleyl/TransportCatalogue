@@ -6,7 +6,7 @@
 void ReadInput(std::istream &input, TransportCatalogue &catalogue) {
     std::cout << "Enter the number of inputs: ";
     int n;
-    if (!(std::cin >> n)) {
+    if (!(input >> n)) {
         throw std::runtime_error("Invalid input: number of commands must be an integer");
     }
     std::cin.ignore();

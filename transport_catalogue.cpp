@@ -17,6 +17,7 @@ TransportCatalogue::TransportCatalogue() = default;
 TransportCatalogue::~TransportCatalogue() = default;
 
 void TransportCatalogue::addStop(Stop stop) {
+    stop.name.erase(0, stop.name.find_first_not_of(' '));
     auto it = stop_name_to_stop_.find(stop.name);
     if (it != stop_name_to_stop_.end()) {
         it->second->latitude = stop.latitude;
