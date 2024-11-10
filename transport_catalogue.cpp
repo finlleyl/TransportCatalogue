@@ -33,6 +33,10 @@ void TransportCatalogue::addBus(Bus bus) {
     buses_.push_back(std::move(bus));
     Bus& added_bus = buses_.back();
     bus_name_to_bus_.emplace(added_bus.name, &added_bus);
+
+    for (const Stop* stop : added_bus.stops) {
+        stop_to_buses_[stop].insert(&added_bus);
+    }
 }
 
 const Stop* TransportCatalogue::findStop(std::string_view stop_name) const {
@@ -95,4 +99,16 @@ std::optional<RouteInfo> TransportCatalogue::getRouteInfo(std::string_view bus_n
     }
 
     return RouteInfo{stop_count, unique_stop_count, route_length};
+}
+
+std::optional<StopInfo> TransportCatalogue::getStopInfo(std::string_view stop_name) const {
+    const Stop* stop = findStop(stop_name);
+    if (!stop) {
+        return std::nullopt;
+    }
+    auto it = stop_to_buses_.find(stop);
+    if (it != stop_to_buses_.end()) {
+        return StopInfo{stop->name, it->second};
+    }
+    return StopInfo{stop->name, {}};
 }

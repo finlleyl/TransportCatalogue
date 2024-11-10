@@ -32,8 +32,7 @@ void OutputBus(std::istream &input, std::ostream &output, const TransportCatalog
     bus_name.erase(0, bus_name.find_first_not_of(' '));
 
     if (catalogue.findBus(bus_name)) {
-        auto route_info = catalogue.getRouteInfo(bus_name);
-        if (route_info.has_value()) {
+        if (const auto route_info = catalogue.getRouteInfo(bus_name); route_info.has_value()) {
             output << "Bus " << bus_name << ": "
                       << route_info.value().stop_count << " stops on route, "
                       << route_info.value().unique_stop_count << " unique stops, "
@@ -47,5 +46,22 @@ void OutputBus(std::istream &input, std::ostream &output, const TransportCatalog
 }
 
 void OutputStop(std::istream &input, std::ostream &output, const TransportCatalogue &catalogue) {
-    return;
+    std::string stop_name;
+    input >> stop_name;
+    stop_name.erase(0, stop_name.find_first_not_of(' '));
+
+    if (const auto stop_info = catalogue.getStopInfo(stop_name); stop_info.has_value()) {
+        if (const auto& buses = stop_info->buses; buses.empty()) {
+            output << "Stop " << stop_name << ": no buses" << std::endl;
+        } else {
+            output << "Stop " << stop_name << ": buses";
+            for (const Bus* bus : buses) {
+                output << " " << bus->name;
+            }
+            output << std::endl;
+        }
+    } else {
+        output << "Stop " << stop_name << ": not found" << std::endl;
+    }
 }
+

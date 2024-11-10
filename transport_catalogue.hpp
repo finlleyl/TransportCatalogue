@@ -9,6 +9,7 @@
 #include <string>
 #include <functional>
 #include <optional>
+#include <set>
 
 struct Stop {
     std::string name;
@@ -32,12 +33,18 @@ struct RouteInfo {
     double route_length;
 };
 
+struct StopInfo {
+    std::string name;
+    std::set<const Bus*> buses;
+};
+
 class TransportCatalogue {
 private:
     std::deque<Stop> stops_;
     std::deque<Bus> buses_;
     std::unordered_map<std::string_view, Stop*> stop_name_to_stop_;
     std::unordered_map<std::string_view, Bus*> bus_name_to_bus_;
+    std::unordered_map<const Stop*, std::set<const Bus*>> stop_to_buses_;
 
 public:
     TransportCatalogue();
@@ -61,6 +68,8 @@ public:
     void add_to_bus_name_to_bus(std::string_view bus_name, Bus *bus);
 
     std::optional<RouteInfo> getRouteInfo(std::string_view bus_name) const;
+
+    std::optional<StopInfo> getStopInfo(std::string_view stop_name) const;
 };
 
 #endif //TRANSPORT_CATALOGUE_HPP
