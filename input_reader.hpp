@@ -17,5 +17,7 @@ Bus parseBus(std::istream &input, TransportCatalogue &catalogue);
 
 std::vector<std::string_view> Split(std::string_view str, char delimiter);
 
+void RemoveUnwantedCharacters(std::string& str);
+
 
 #endif //INPUT_READER_HPP

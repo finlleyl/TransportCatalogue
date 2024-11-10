@@ -38,6 +38,11 @@ struct StopInfo {
     std::set<const Bus*> buses;
 };
 
+struct StopPairHasher {
+    size_t operator()(const std::pair<const Stop*, const Stop*>& stops) const noexcept;
+};
+
+
 class TransportCatalogue {
 private:
     std::deque<Stop> stops_;
@@ -45,6 +50,7 @@ private:
     std::unordered_map<std::string_view, Stop*> stop_name_to_stop_;
     std::unordered_map<std::string_view, Bus*> bus_name_to_bus_;
     std::unordered_map<const Stop*, std::set<const Bus*>> stop_to_buses_;
+    std::unordered_map<std::pair<const Stop*, const Stop*>, double, StopPairHasher> distances_;
 
 public:
     TransportCatalogue();
@@ -70,6 +76,11 @@ public:
     std::optional<RouteInfo> getRouteInfo(std::string_view bus_name) const;
 
     std::optional<StopInfo> getStopInfo(std::string_view stop_name) const;
+
+    void setDistance(const Stop* from, const Stop* to, double distance);
+
+    double getDistance(const Stop* from, const Stop* to) const;
+
 };
 
 #endif //TRANSPORT_CATALOGUE_HPP

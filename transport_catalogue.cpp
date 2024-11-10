@@ -12,6 +12,10 @@ Stop::Stop(std::string name, double latitude, double longitude): name(std::move(
 
 Bus::Bus(std::string name, std::vector<const Stop *> stops, bool is_round_trip): name(std::move(name)), stops(std::move(stops)), is_round_trip(is_round_trip) {}
 
+size_t StopPairHasher::operator()(const std::pair<const Stop *, const Stop *> &stops) const noexcept {
+    return std::hash<const void*>()(stops.first) ^ (std::hash<const void*>()(stops.second) << 1);
+}
+
 TransportCatalogue::TransportCatalogue() = default;
 
 TransportCatalogue::~TransportCatalogue() = default;
@@ -112,4 +116,20 @@ std::optional<StopInfo> TransportCatalogue::getStopInfo(std::string_view stop_na
         return StopInfo{stop->name, it->second};
     }
     return StopInfo{stop->name, {}};
+}
+
+void TransportCatalogue::setDistance(const Stop *from, const Stop *to, double distance) {
+    distances_[{from, to}] = distance;
+}
+
+double TransportCatalogue::getDistance(const Stop *from, const Stop *to) const {
+    if (const auto it = distances_.find({from, to}); it != distances_.end()) {
+        return it->second;
+    }
+
+    if (const auto it = distances_.find({to, from}); it != distances_.end()) {
+        return it->second;
+    }
+
+    return 0;
 }

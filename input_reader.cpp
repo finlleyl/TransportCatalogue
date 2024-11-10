@@ -29,29 +29,45 @@ void ReadInput(std::istream &input, TransportCatalogue &catalogue) {
     }
 }
 
-Stop parseStop(std::istream &input) {
-    std::string stop_name;
+void RemoveUnwantedCharacters(std::string &str) {
+    str.erase(std::remove_if(str.begin(), str.end(),
+                             [](char c) { return c == ',' || c == ':'; }),
+              str.end());
+}
+
+Stop parseStop(std::istream& input) {
+    std::string line;
+    std::getline(input, line);
+
+    RemoveUnwantedCharacters(line);
+
+    std::istringstream line_stream(line);
+
+    std::string stop_keyword, stop_name;
     double latitude, longitude;
 
-    if (!std::getline(input, stop_name, ':')) {
-        throw std::runtime_error("Invalid stop format: no name found");
+    line_stream >> stop_keyword;
+    std::getline(line_stream, stop_name, ' ');
+    stop_name.erase(stop_name.find_last_not_of(' ') + 1);
+
+    line_stream >> latitude >> longitude;
+
+    std::unordered_map<std::string, int> distances;
+    std::string distance_part;
+    while (line_stream >> distance_part) {
+        auto m_pos = distance_part.find('m');
+        if (m_pos == std::string::npos) {
+            throw std::runtime_error("Invalid distance format");
+        }
+
+        int distance = std::stoi(distance_part.substr(0, m_pos));
+
+        std::string to_stop;
+        line_stream >> to_stop >> to_stop;
+        distances[to_stop] = distance;
     }
 
-    std::string coordinates;
-    if (!std::getline(input, coordinates)) {
-        throw std::runtime_error("Invalid stop format: no coordinates found");
-    }
-
-    coordinates.erase(0, coordinates.find_first_not_of(' '));
-
-    std::erase(coordinates, ',');
-
-    std::istringstream iss(coordinates);
-    if (!(iss >> latitude >> longitude)) {
-        throw std::runtime_error("Invalid stop format: incorrect coordinates");
-    }
-
-    return {std::move(stop_name), latitude, longitude};
+    return Stop{stop_name, latitude, longitude};
 }
 
 std::vector<std::string_view> Split(std::string_view str, char delimiter) {
